@@ -92,12 +92,16 @@ if let pod_archive_path = ProcessInfo.processInfo.environment["ORT_POD_LOCAL_PAT
     package.targets.append(Target.binaryTarget(name: "onnxruntime", path: pod_archive_path))
 
 } else {
-    // ORT release
+    // ORT release, as a LIBRARY-format xcframework (static libraries + headers). Repackaged by Helix from Microsoft's
+    // pod-archive-onnxruntime-c-1.24.2.zip (sha256 f7100a99...) with the libraries and headers byte-identical; only the
+    // packaging changes. Microsoft's archive wraps the static libraries in .framework bundles, which Xcode embeds with a
+    // generated stub dylib that App Store Connect rejects (ITMS-90208). A library-format target is link-only, so nothing
+    // is embedded. Same approach as this repo's commit 8fa26c1 (scripts/repackage_ort_spm_artifact.sh).
     package.targets.append(
        Target.binaryTarget(name: "onnxruntime",
-                           url: "https://github.com/Helix-ID/onnxruntime-swift-package-manager/releases/download/ort-binaries-1.24.2/pod-archive-onnxruntime-c-1.24.2.zip",
-                           // SHA256 checksum
-                           checksum: "f7100a992d2a8135168c8afd831e6a58b465349101982aa58b3e11d36e600b54")
+                           url: "https://github.com/Helix-ID/onnxruntime-swift-package-manager/releases/download/ort-binaries-1.24.2/onnxruntime-libs-1.24.2.zip",
+                           // SwiftPM (SHA256) checksum of the release asset
+                           checksum: "a42489b8353c1ea225f15aeb499d142e50ea9b9c96e0770be39df5871d9a6a63")
     )
 }
 
